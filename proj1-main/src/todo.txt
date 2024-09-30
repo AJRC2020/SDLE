@@ -1,0 +1,82 @@
+
+DONE (Joao)
+Caso em que proxy recebe um PUT de publisher:
+    se topico nao existir na proxy:
+        dar erro pq topico nao existe
+        responder com NON_EXISTENT
+    senao
+        criar mensagem na proxy:
+            adicionar mensagem ao topico na proxy
+            atribuir um id de mensagem (um numeor e talvez dependente do topico e nao do sistema geral)
+            criar uma lista de subscirbers a quem é preciso enviar a mesnagem em questao
+
+DONE (Joao)
+Caso em que publisher tenta fazer PUT de dados:
+    enviar dadosºº
+    se reposta for "NON_EXISTENT":
+        o topico nao existia logo retornar falso
+    se a reposta for "ACK"
+        o topico existia logo retornar true
+
+(Marina)
+Caso de subscriber enviar SUB para proxy:
+    se topico nao existir na proxy:
+        verificar se nome do topico tem espacos
+        se nao
+            criar topico
+        se tem
+            responder com "INVALID_TOPIC"
+            (se tiver espacos no nome do topico vai dar asneira no decoding das mensagens)
+    se existir:
+        adicionar subscriber à lista de subscribers do tópico
+
+(Filipe)
+Caso de subscriber enviar GET para proxy:
+    se topico nao existir:
+        dar erro
+        (Mayber responder com NON_EXISTENT)
+    se nao esta subscrito ao topico expecificado no GET:
+        dar erro
+        (Maybe responder com NOT_SUBSCRIBED)
+    percorrer todas as mensagens do topico:
+        se subscriber ainda nao recebeu essa mensagem juntar a uma lista de mensagens
+    enviar lista
+
+DONE
+Caso de subscriber enviar ACK de mensagem para proxy:
+    ir à mensagem no topico em questao e remover o subscriber da lista leftSubscriber
+    se mensagem no topico nao tiver mais subscribers para enviar a mensagem (len(leftSubscriber) == 0) remover mensagem do topico
+
+DONE (Joao)
+Caso de subscriber receber mensagens
+    se a mensagem for repetida:
+        descarta
+        envia mensagem de ack com id da mensagem recebida (para proxy avancar)
+    senao:
+        reconhece e responde com um ACK
+
+DONE
+Caso de proxy receber um ACK
+    remover user da mensagem reconhecida
+    se mensagem nao tiver mais subscribers
+        apagar mensagem (aka remover do topico) (feito automaticamente se funcao removeSubscriberToDeliver usada)
+
+DONE
+Caso de proxy receber UNSUB de subscriber:
+    proxy remove subscriber da lista de subscribers do topico
+    proxy remove subscirber de todas as mesnagens que eram suposte se-lhe entregues
+    se topico nao tem subscribers:
+        apagar topico (?)
+
+DONE
+Caso subscriber conectar a proxy:
+    Criar socket de requests
+    Mandar requests "LOGIN"
+    Esperar por resposta "LOGIN:<userid>"
+    Se nao chegar em TIMEOUT segundos:
+        dar erro
+
+DONE
+Caso proxy receber tentativa de conexao de subscriber:
+    Ver o ultimo id atribuido e atribuir o seguinte
+    Reponder com "LOGIN:<userID>" em que userID é este id seguinte
